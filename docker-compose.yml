@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: airquality-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=airquality
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: airquality-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+  # Backend API (optional - for production-like setup)
+  # Uncomment to run backend in Docker
+  # backend:
+  #   build: ./backend
+  #   container_name: airquality-backend
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5000:5000"
+  #   volumes:
+  #     - ./backend:/app
+  #     - /app/node_modules
+  #   environment:
+  #     - NODE_ENV=development
+  #   env_file:
+  #     - ./backend/.env
+  #   depends_on:
+  #     - mongodb
+  #     - redis
+
+volumes:
+  mongodb_data:
+  redis_data:

@@ -40,6 +40,15 @@
                     "microphonePermission": "Allow Air Quality to access your microphone for voice chat."
                 }
             ]
-        ]
+        ],
+        "updates": {
+            "enabled": false,
+            "checkAutomatically": "NEVER",
+            "fallbackToCacheTimeout": 0,
+            "url": ""
+        },
+        "runtimeVersion": {
+            "policy": "sdkVersion"
+        }
     }
 }

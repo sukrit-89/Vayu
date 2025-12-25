@@ -3,7 +3,9 @@ const User = require('../models/User');
 const { getCurrentAQI } = require('./aqiService');
 
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
+    apiKey: process.env.OPENAI_API_KEY,
+    timeout: 60000, // 60 seconds timeout
+    maxRetries: 3,   // Retry failed requests up to 3 times
 });
 
 /**
@@ -85,13 +87,30 @@ async function handleVoiceChat(userId, audioFilePath) {
     const fs = require('fs');
 
     try {
+        // Validate file exists
+        if (!fs.existsSync(audioFilePath)) {
+            console.error('❌ Audio file not found:', audioFilePath);
+            throw new Error('Audio file not found');
+        }
+
+        // Check file size
+        const stats = fs.statSync(audioFilePath);
+        console.log(`📁 Audio file: ${audioFilePath}, Size: ${stats.size} bytes`);
+
+        if (stats.size === 0) {
+            console.error('❌ Audio file is empty');
+            throw new Error('Audio file is empty');
+        }
+
         // Transcribe audio using OpenAI Whisper
+        console.log('🎤 Starting Whisper transcription...');
         const transcription = await openai.audio.transcriptions.create({
             file: fs.createReadStream(audioFilePath),
             model: 'whisper-1'
         });
 
         const userMessage = transcription.text;
+        console.log(`✅ Transcribed: "${userMessage}"`);
 
         // Get text response
         const aiResponse = await handleChat(userId, userMessage);
@@ -103,8 +122,29 @@ async function handleVoiceChat(userId, audioFilePath) {
         };
 
     } catch (error) {
-        console.error('❌ Voice chat error:', error.message);
-        throw new Error('Unable to process voice chat');
+        console.error('❌ Voice chat error details:');
+        console.error('  Error name:', error.name);
+        console.error('  Error message:', error.message);
+        console.error('  Error stack:', error.stack);
+
+        // Log OpenAI specific errors
+        if (error.response) {
+            console.error('  OpenAI API Response:', {
+                status: error.response.status,
+                data: error.response.data
+            });
+        }
+
+        // Return user-friendly error
+        if (error.message.includes('API key')) {
+            throw new Error('OpenAI API key is invalid or missing');
+        } else if (error.message.includes('quota')) {
+            throw new Error('OpenAI API quota exceeded');
+        } else if (error.message.includes('file')) {
+            throw new Error('Audio file processing failed');
+        } else {
+            throw new Error(`Unable to process voice chat: ${error.message}`);
+        }
     }
 }
 

@@ -31,16 +31,30 @@ export default function HomeScreen({ navigation }) {
         try {
             // Fetch AQI for user's location
             if (user?.location) {
-                const aqiResponse = await aqiAPI.getCurrent(user.location.city, user.location.state);
-                setAqiData(aqiResponse.data.data);
+                try {
+                    const aqiResponse = await aqiAPI.getCurrent(
+                        user.location.city,
+                        user.location.state,
+                        user.location.lat,
+                        user.location.lon
+                    );
+                    setAqiData(aqiResponse.data.data);
+                } catch (aqiError) {
+                    console.error('AQI error:', aqiError);
+                    // Don't block news if AQI fails
+                }
             }
 
-            // Fetch latest news
-            const newsResponse = await newsAPI.getLatest();
-            setNews(newsResponse.data.news.slice(0, 3)); // Show only first 3
+            // Fetch latest news (independent of AQI)
+            try {
+                const newsResponse = await newsAPI.getLatest();
+                setNews(newsResponse.data.news.slice(0, 3)); // Show only first 3
+            } catch (newsError) {
+                console.error('News error:', newsError);
+                Alert.alert('Info', 'Could not load latest news');
+            }
         } catch (error) {
             console.error('Error fetching data:', error);
-            Alert.alert('Error', 'Failed to load data');
         } finally {
             setLoading(false);
             setRefreshing(false);

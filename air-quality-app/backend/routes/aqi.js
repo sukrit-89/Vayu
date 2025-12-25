@@ -7,24 +7,28 @@ const { getCurrentAQI, getForecast } = require('../services/aqiService');
  * GET /api/aqi/current?city=Delhi&state=Delhi
  * Get current AQI for a location
  */
-router.get('/current', verifyToken, async (req, res) => {
+router.get('/current', async (req, res) => {
     try {
-        const { city, state } = req.query;
+        const { city, state, lat, lon } = req.query;
 
         if (!city) {
-            return res.status(400).json({ error: 'City parameter required' });
+            return res.status(400).json({ error: 'City is required' });
         }
 
-        const aqiData = await getCurrentAQI(city, state);
+        // Pass lat/lon if provided (for OpenWeatherMap)
+        const latitude = lat ? parseFloat(lat) : null;
+        const longitude = lon ? parseFloat(lon) : null;
+
+        const data = await getCurrentAQI(city, state, latitude, longitude);
 
         res.json({
             success: true,
-            data: aqiData
+            data
         });
 
     } catch (error) {
-        console.error('AQI fetch error:', error);
-        res.status(500).json({ error: 'Unable to fetch AQI data', message: error.message });
+        console.log('AQI fetch error:', error);
+        res.status(500).json({ error: error.message });
     }
 });
 

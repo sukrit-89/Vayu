@@ -2,7 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // API Base URL - update this for production
-const API_URL = process.env.API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.API_URL || 'http://192.168.0.7:5000/api';
 
 // Create axios instance
 const api = axios.create({
@@ -53,7 +53,9 @@ export const authAPI = {
 
 // AQI API
 export const aqiAPI = {
-    getCurrent: (city, state) => api.get('/aqi/current', { params: { city, state } }),
+    getCurrent: (city, state, lat, lon) => api.get('/aqi/current', {
+        params: { city, state, lat, lon }
+    }),
     getForecast: (city) => api.get('/aqi/forecast', { params: { city } }),
 };
 

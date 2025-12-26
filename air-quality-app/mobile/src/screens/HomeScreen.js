@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import * as Location from 'expo-location';
 import AQICard from '../components/AQICard';
 import { useAuth } from '../context/AuthContext';
 import { aqiAPI, newsAPI } from '../services/api';
@@ -22,25 +23,61 @@ export default function HomeScreen({ navigation }) {
     const [news, setNews] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const [gpsLocation, setGPSLocation] = useState(null);
+    const [locationName, setLocationName] = useState(null);
 
+    // Get GPS location on first load
     useEffect(() => {
-        fetchData();
+        (async () => {
+            try {
+                const { status } = await Location.requestForegroundPermissionsAsync();
+                if (status === 'granted') {
+                    const loc = await Location.getCurrentPositionAsync({});
+                    const { latitude, longitude } = loc.coords;
+
+                    setGPSLocation({ latitude, longitude });
+
+                    // Reverse geocode to get city name
+                    try {
+                        const geocode = await Location.reverseGeocodeAsync({ latitude, longitude });
+                        if (geocode && geocode[0]) {
+                            const { city, district, subregion, region } = geocode[0];
+                            setLocationName(city || district || subregion || region || 'Your Location');
+                        }
+                    } catch (geoError) {
+                        console.log('Geocoding failed:', geoError);
+                        setLocationName('Your Location');
+                    }
+                }
+            } catch (error) {
+                console.error('GPS error:', error);
+            }
+        })();
     }, []);
+
+    // Fetch data when GPS or user location is available
+    useEffect(() => {
+        if (gpsLocation || user?.location) {
+            fetchData();
+        }
+    }, [gpsLocation, user]);
 
     const fetchData = async () => {
         try {
-            // Fetch AQI for user's location
-            if (user?.location) {
+            // Use GPS location if available, otherwise fallback to user profile location
+            const locationToUse = gpsLocation || user?.location;
+
+            if (locationToUse) {
                 try {
                     const aqiResponse = await aqiAPI.getCurrent(
-                        user.location.city,
-                        user.location.state,
-                        user.location.lat,
-                        user.location.lon
+                        null,  // city - not needed with GPS
+                        null,  // state - not needed with GPS
+                        locationToUse.latitude || locationToUse.lat,
+                        locationToUse.longitude || locationToUse.lon
                     );
                     setAqiData(aqiResponse.data.data);
-                } catch (aqiError) {
-                    console.error('AQI error:', aqiError);
+                } catch (error) {
+                    console.error('AQI error', error);
                     // Don't block news if AQI fails
                 }
             }
@@ -91,7 +128,7 @@ export default function HomeScreen({ navigation }) {
                 {aqiData && (
                     <AQICard
                         aqi={aqiData.aqi}
-                        city={aqiData.city}
+                        city={locationName || aqiData.city || 'Your Location'}
                         state={aqiData.state}
                     />
                 )}

@@ -8,7 +8,8 @@ const aqiDataSchema = new mongoose.Schema({
     },
     state: {
         type: String,
-        required: true
+        required: false,
+        default: ''
     },
     station: {
         type: String,

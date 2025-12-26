@@ -12,10 +12,13 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import VoiceButton from '../components/VoiceButton';
-import { chatAPI } from '../services/api';
+import { chatAPI, aqiAPI } from '../services/api';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../context/AuthContext';
+import * as Location from 'expo-location';
 
 export default function ChatScreen() {
+    const { user } = useAuth();
     const [messages, setMessages] = useState([
         {
             id: '1',
@@ -25,6 +28,57 @@ export default function ChatScreen() {
     ]);
     const [inputText, setInputText] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [currentAQI, setCurrentAQI] = useState(null);
+    const [gpsLocation, setGpsLocation] = useState(null);
+    const [fetchingAQI, setFetchingAQI] = useState(true);
+
+    // Get GPS location (same as HomeScreen)
+    React.useEffect(() => {
+        (async () => {
+            try {
+                const { status } = await Location.requestForegroundPermissionsAsync();
+                if (status === 'granted') {
+                    const loc = await Location.getCurrentPositionAsync({});
+                    setGpsLocation({
+                        latitude: loc.coords.latitude,
+                        longitude: loc.coords.longitude
+                    });
+                } else {
+                    setFetchingAQI(false);
+                }
+            } catch (error) {
+                console.error('GPS error:', error);
+                setFetchingAQI(false);
+            }
+        })();
+    }, []);
+
+    // Fetch AQI when GPS is ready
+    React.useEffect(() => {
+        const fetchAQI = async () => {
+            try {
+                const locationToUse = gpsLocation || user?.location;
+                if (locationToUse) {
+                    const response = await aqiAPI.getCurrent(
+                        null,  // city
+                        null,  // state
+                        locationToUse.latitude || locationToUse.lat,
+                        locationToUse.longitude || locationToUse.lon
+                    );
+                    setCurrentAQI(response.data.data);
+                    console.log('Chat AQI loaded:', response.data.data.aqi);
+                }
+            } catch (error) {
+                console.log('Could not fetch AQI for chat:', error);
+            } finally {
+                setFetchingAQI(false);
+            }
+        };
+
+        if (gpsLocation || user?.location) {
+            fetchAQI();
+        }
+    }, [gpsLocation, user]);
 
     const sendMessage = async (messageText) => {
         if (!messageText || messageText.trim().length === 0) return;
@@ -40,8 +94,8 @@ export default function ChatScreen() {
         setIsLoading(true);
 
         try {
-            // Send to API
-            const response = await chatAPI.sendMessage(messageText);
+            // Send to API with current AQI
+            const response = await chatAPI.sendMessage(messageText, currentAQI);
             const aiResponse = response.data.ai_response;
 
             // Add bot response

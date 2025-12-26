@@ -26,13 +26,21 @@ const upload = multer({
  */
 router.post('/', verifyToken, chatLimiter, async (req, res) => {
     try {
-        const { message } = req.body;
+        const { message, currentAQI } = req.body;
 
         if (!message || message.trim().length === 0) {
             return res.status(400).json({ error: 'Message cannot be empty' });
         }
 
-        const response = await handleChat(req.userId, message);
+        // Debug logging
+        console.log('💬 Chat request:', {
+            message: message.substring(0, 50),
+            hasAQI: !!currentAQI,
+            aqiValue: currentAQI?.aqi
+        });
+
+        // Pass current AQI from mobile app (if provided)
+        const response = await handleChat(req.userId, message, currentAQI);
 
         res.json({
             success: true,

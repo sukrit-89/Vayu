@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const verifyToken = require('../middleware/auth');
 
 /**
  * POST /api/auth/register
@@ -120,6 +121,67 @@ router.post('/login', async (req, res) => {
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ error: 'Login failed' });
+    }
+});
+
+/**
+ * PUT /api/auth/location
+ * Update user's location and fetch AQI for new location
+ */
+router.put('/location', verifyToken, async (req, res) => {
+    try {
+        const { city, state, lat, lon } = req.body;
+
+        if (!city || !state || !lat || !lon) {
+            return res.status(400).json({
+                error: 'City, state, latitude, and longitude are required'
+            });
+        }
+
+        // Update user location
+        const user = await User.findByIdAndUpdate(
+            req.userId,
+            {
+                location: {
+                    city,
+                    state,
+                    lat: parseFloat(lat),
+                    lon: parseFloat(lon)
+                }
+            },
+            { new: true }
+        ).select('-password');
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Fetch AQI for new location
+        const { getCurrentAQI } = require('../services/aqiService');
+        let aqiData = null;
+
+        try {
+            aqiData = await getCurrentAQI(city, state, parseFloat(lat), parseFloat(lon));
+        } catch (aqiError) {
+            console.error('AQI fetch error after location update:', aqiError.message);
+            // Continue even if AQI fetch fails
+        }
+
+        res.json({
+            success: true,
+            message: 'Location updated successfully',
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                location: user.location
+            },
+            aqi: aqiData
+        });
+
+    } catch (error) {
+        console.error('Location update error:', error);
+        res.status(500).json({ error: 'Failed to update location' });
     }
 });
 

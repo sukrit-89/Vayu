@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     View,
     Text,
@@ -13,6 +13,15 @@ import { useAuth } from '../context/AuthContext';
 
 export default function ProfileScreen() {
     const { user, logout } = useAuth();
+
+    const getAQICategory = (aqi) => {
+        if (aqi <= 50) return 'Good';
+        if (aqi <= 100) return 'Moderate';
+        if (aqi <= 150) return 'Unhealthy for Sensitive';
+        if (aqi <= 200) return 'Unhealthy';
+        if (aqi <= 300) return 'Very Unhealthy';
+        return 'Hazardous';
+    };
 
     const handleLogout = () => {
         Alert.alert(

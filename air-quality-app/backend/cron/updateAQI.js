@@ -2,19 +2,19 @@ const AQIData = require('../models/AQIData');
 const { getCurrentAQI } = require('../services/aqiService');
 
 /**
- * Major Indian cities to track
+ * Major Indian cities to track with coordinates
  */
 const MAJOR_CITIES = [
-    { city: 'Delhi', state: 'Delhi' },
-    { city: 'Mumbai', state: 'Maharashtra' },
-    { city: 'Bengaluru', state: 'Karnataka' },
-    { city: 'Kolkata', state: 'West Bengal' },
-    { city: 'Chennai', state: 'Tamil Nadu' },
-    { city: 'Hyderabad', state: 'Telangana' },
-    { city: 'Pune', state: 'Maharashtra' },
-    { city: 'Ahmedabad', state: 'Gujarat' },
-    { city: 'Jaipur', state: 'Rajasthan' },
-    { city: 'Lucknow', state: 'Uttar Pradesh' }
+    { city: 'Delhi', state: 'Delhi', lat: 28.7041, lon: 77.1025 },
+    { city: 'Mumbai', state: 'Maharashtra', lat: 19.0760, lon: 72.8777 },
+    { city: 'Bengaluru', state: 'Karnataka', lat: 12.9716, lon: 77.5946 },
+    { city: 'Kolkata', state: 'West Bengal', lat: 22.5726, lon: 88.3639 },
+    { city: 'Chennai', state: 'Tamil Nadu', lat: 13.0827, lon: 80.2707 },
+    { city: 'Hyderabad', state: 'Telangana', lat: 17.3850, lon: 78.4867 },
+    { city: 'Pune', state: 'Maharashtra', lat: 18.5204, lon: 73.8567 },
+    { city: 'Ahmedabad', state: 'Gujarat', lat: 23.0225, lon: 72.5714 },
+    { city: 'Jaipur', state: 'Rajasthan', lat: 26.9124, lon: 75.7873 },
+    { city: 'Lucknow', state: 'Uttar Pradesh', lat: 26.8467, lon: 80.9462 }
 ];
 
 /**
@@ -26,7 +26,7 @@ async function updateAQI() {
 
     for (const location of MAJOR_CITIES) {
         try {
-            await getCurrentAQI(location.city, location.state);
+            await getCurrentAQI(location.city, location.state, location.lat, location.lon);
             console.log(`✅ Updated AQI for ${location.city}`);
         } catch (error) {
             console.error(`❌ Failed to update AQI for ${location.city}:`, error.message);

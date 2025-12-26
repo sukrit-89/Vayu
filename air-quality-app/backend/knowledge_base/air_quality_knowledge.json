@@ -1,0 +1,182 @@
+[
+    {
+        "id": "naqi_0_50_good",
+        "content": "AQI 0-50 (Good): Air quality is satisfactory, and air pollution poses little or no risk. People can enjoy normal outdoor activities. No health precautions needed.",
+        "category": "health_effects",
+        "aqi_range": "0-50"
+    },
+    {
+        "id": "naqi_51_100_satisfactory",
+        "content": "AQI 51-100 (Satisfactory): Air quality is acceptable. However, sensitive individuals may experience minor respiratory issues with prolonged exposure. General public can continue outdoor activities.",
+        "category": "health_effects",
+        "aqi_range": "51-100"
+    },
+    {
+        "id": "naqi_101_200_moderate",
+        "content": "AQI 101-200 (Moderate): Members of sensitive groups (children, elderly, people with lung/heart disease) may experience health effects. General public less likely to be affected. Reduce prolonged outdoor exertion.",
+        "category": "health_effects",
+        "aqi_range": "101-200"
+    },
+    {
+        "id": "naqi_201_300_poor",
+        "content": "AQI 201-300 (Poor): Everyone may begin to experience health effects. Sensitive groups may experience more serious effects. Avoid outdoor activities. Use N95 masks when going outside. Keep windows closed. Use air purifiers indoors.",
+        "category": "health_effects",
+        "aqi_range": "201-300"
+    },
+    {
+        "id": "naqi_301_400_very_poor",
+        "content": "AQI 301-400 (Very Poor): Health alert. Everyone may experience serious health effects. Avoid all outdoor physical activities. Stay indoors with air purifiers. Use N99 masks if you must go out. Seek medical attention if experiencing difficulty breathing.",
+        "category": "health_effects",
+        "aqi_range": "301-400"
+    },
+    {
+        "id": "naqi_401_plus_severe",
+        "content": "AQI 401+ (Severe): Health emergency. Everyone is at risk of serious health effects. Stay indoors at all times. Keep all windows and doors closed. Use air purifiers continuously. Seek immediate medical attention for any respiratory symptoms. Schools and offices should be closed.",
+        "category": "health_effects",
+        "aqi_range": "401+"
+    },
+    {
+        "id": "pm25_explained",
+        "content": "PM2.5 (Particulate Matter 2.5): Fine particles 2.5 micrometers or smaller. Can penetrate deep into lungs and enter bloodstream. Main cause of haze and reduced visibility. Sources include vehicle emissions, industrial processes, and burning of biomass. Most harmful pollutant for human health.",
+        "category": "pollutants",
+        "pollutant": "pm25"
+    },
+    {
+        "id": "pm10_explained",
+        "content": "PM10 (Particulate Matter 10): Coarse particles between 2.5 and 10 micrometers. Can irritate eyes, nose, and throat. Sources include dust from roads, construction sites, and agriculture. Less harmful than PM2.5 but still poses health risks.",
+        "category": "pollutants",
+        "pollutant": "pm10"
+    },
+    {
+        "id": "no2_explained",
+        "content": "NO2 (Nitrogen Dioxide): Gas from vehicle emissions and power plants. Causes inflammation of airways. Can aggravate asthma and reduce immunity to lung infections. Creates brown haze in urban areas.",
+        "category": "pollutants",
+        "pollutant": "no2"
+    },
+    {
+        "id": "so2_explained",
+        "content": "SO2 (Sulfur Dioxide): Gas from burning coal and oil. Irritates respiratory system. Can trigger asthma attacks. Forms acid rain when combined with water vapor.",
+        "category": "pollutants",
+        "pollutant": "so2"
+    },
+    {
+        "id": "masks_n95",
+        "content": "N95 masks: Filter 95% of airborne particles including PM2.5. Essential when AQI is above 200. Ensure proper fit with no gaps. Replace after 8 hours of use or when breathing becomes difficult. Available at pharmacies for ₹50-200 per mask.",
+        "category": "protection",
+        "measure": "masks"
+    },
+    {
+        "id": "masks_n99",
+        "content": "N99 masks: Filter 99% of particles. Recommended when AQI exceeds 300. More effective than N95 but also more expensive (₹200-500). Essential for sensitive individuals during severe pollution episodes.",
+        "category": "protection",
+        "measure": "masks"
+    },
+    {
+        "id": "air_purifiers",
+        "content": "Air purifiers: Use HEPA filters to remove PM2.5 and other pollutants indoors. Essential when outdoor AQI is above 150. Position in bedrooms and living areas. Clean or replace filters every 3-6 months. Affordable options available from ₹3000 onwards.",
+        "category": "protection",
+        "measure": "air_purifier"
+    },
+    {
+        "id": "indoor_plants",
+        "content": "Indoor plants for air quality: Areca Palm, Snake Plant, and Money Plant can help improve indoor air quality. They absorb CO2 and release oxygen. While not a substitute for air purifiers, they provide marginal air quality improvements and aesthetic benefits.",
+        "category": "protection",
+        "measure": "plants"
+    },
+    {
+        "id": "windows_ventilation",
+        "content": "Window management: Keep windows closed when outdoor AQI is above 100. Open windows early morning (5-7 AM) when pollution is typically lower. Use exhaust fans in kitchen and bathroom. Cross-ventilate during low AQI periods.",
+        "category": "protection",
+        "measure": "ventilation"
+    },
+    {
+        "id": "exercise_outdoors",
+        "content": "Outdoor exercise guidelines: AQI 0-50: Safe for all activities. AQI 51-100: Reduce intense activities. AQI 101-150: Sensitive people should limit outdoor exercise. AQI 150+: Everyone should avoid outdoor physical activities. Exercise indoors instead.",
+        "category": "activities",
+        "activity": "exercise"
+    },
+    {
+        "id": "children_precautions",
+        "content": "Children and air pollution: Children are more vulnerable as they breathe faster and their lungs are still developing. Limit outdoor playtime when AQI > 100. Ensure schools have air purifiers. Watch for symptoms like coughing, wheezing, or difficulty breathing.",
+        "category": "vulnerable_groups",
+        "group": "children"
+    },
+    {
+        "id": "elderly_precautions",
+        "content": "Elderly and air pollution: People over 65 are at higher risk due to reduced immunity and existing health conditions. Stay indoors when AQI > 150. Take prescribed medications regularly. Monitor for chest pain, irregular heartbeat, or unusual fatigue.",
+        "category": "vulnerable_groups",
+        "group": "elderly"
+    },
+    {
+        "id": "asthma_pollution",
+        "content": "Asthma and air pollution: Pollution triggers asthma attacks. Always carry inhaler. Avoid outdoor activities when AQI > 100. Use N95 masks when going out. Keep windows closed. Monitor peak flow regularly. Consult doctor if symptoms worsen.",
+        "category": "health_conditions",
+        "condition": "asthma"
+    },
+    {
+        "id": "pregnancy_pollution",
+        "content": "Pregnancy and air pollution: Exposure to pollution can affect fetal development. Stay indoors when AQI > 150. Use air purifiers at home. Wear N95 masks outdoors. Attend regular prenatal checkups. Eat antioxidant-rich foods (fruits, vegetables).",
+        "category": "vulnerable_groups",
+        "group": "pregnant"
+    },
+    {
+        "id": "home_remedies_steam",
+        "content": "Steam inhalation: Add eucalyptus oil or tulsi leaves to hot water. Inhale steam for 10-15 minutes. Helps clear respiratory passages. Safe and effective home remedy. Do twice daily when experiencing congestion.",
+        "category": "remedies",
+        "remedy": "steam"
+    },
+    {
+        "id": "home_remedies_jaggery",
+        "content": "Jaggery (Gur): Natural detoxifying agent. Helps cleanse lungs. Consume 10-15g daily with tea or as is. Rich in iron and minerals. Traditional Ayurvedic remedy for pollution exposure.",
+        "category": "remedies",
+        "remedy": "jaggery"
+    },
+    {
+        "id": "home_remedies_turmeric_milk",
+        "content": "Turmeric milk (Haldi Doodh): Mix 1 teaspoon turmeric powder in warm milk. Anti-inflammatory properties. Helps boost immunity. Drink before bedtime. Soothes throat and respiratory system.",
+        "category": "remedies",
+        "remedy": "turmeric_milk"
+    },
+    {
+        "id": "diet_antioxidants",
+        "content": "Anti-pollution diet: Eat foods rich in antioxidants - oranges, berries, green vegetables, nuts, and seeds. Vitamin C and E help combat pollution effects. Drink 8-10 glasses of water daily to flush out toxins. Avoid processed foods.",
+        "category": "remedies",
+        "remedy": "diet"
+    },
+    {
+        "id": "delhi_pollution_pattern",
+        "content": "Delhi air quality patterns: Worst during winter (October-January) due to crop burning, firecrackers, and low wind speeds. AQI often exceeds 400 in November. Best air quality during monsoon (July-August). Early morning (5-7 AM) has relatively better air quality.",
+        "category": "india_specific",
+        "city": "delhi"
+    },
+    {
+        "id": "cpcb_standards",
+        "content": "CPCB (Central Pollution Control Board): Government body monitoring air quality in India. Follows National Air Quality Index (NAQI) based on 8 pollutants. Provides real-time data through network of monitoring stations across major cities.",
+        "category": "india_specific",
+        "topic": "cpcb"
+    },
+    {
+        "id": "graded_response_action_plan",
+        "content": "GRAP (Graded Response Action Plan): Emergency measures in Delhi-NCR based on AQI levels. Stage I (Poor): Dust control, vehicle checks. Stage II (Very Poor): Ban on DG sets. Stage III (Severe): Construction ban. Stage IV (Severe+): Truck entry ban, school closures.",
+        "category": "india_specific",
+        "topic": "grap"
+    },
+    {
+        "id": "when_to_see_doctor",
+        "content": "Seek medical attention immediately if experiencing: persistent cough for more than a week, difficulty breathing, chest pain, irregular heartbeat, or severe headaches. Don't ignore symptoms even if AQI improves. Pollution effects can be delayed.",
+        "category": "medical",
+        "urgency": "high"
+    },
+    {
+        "id": "cost_effective_solutions",
+        "content": "Low-cost pollution protection: DIY air purifier using box fan and HEPA filter (₹1500). Use damp cloth on windows to filter air. Keep indoor plants. Use exhaust fans. Wear cloth masks (better than nothing). Steam inhalation with tulsi is free.",
+        "category": "protection",
+        "cost": "low"
+    },
+    {
+        "id": "aqi_monitoring_apps",
+        "content": "Check air quality on: AQI India app, CPCB Sameer app, or websites like www.aqi.in. Monitor daily before planning outdoor activities. Set alerts for when AQI crosses 150 in your area.",
+        "category": "resources",
+        "type": "apps"
+    }
+]

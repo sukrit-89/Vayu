@@ -1,11 +1,11 @@
 const axios = require('axios');
 const redis = require('../config/redis');
 const AQIData = require('../models/AQIData');
-const { fetchFromOpenWeather } = require('./openweatherHelper');
+const { fetchFromOpenWeather, fetchFromWAQI } = require('./openweatherHelper');
 
 /**
  * Get current AQI data with multi-source fallback
- * Priority: OpenWeatherMap (worldwide) → CPCB (India major cities) → MongoDB cache
+ * Priority: WAQI (India monitoring stations) → OpenWeatherMap (Global) → MongoDB cache
  * @param {string} city - City name
  * @param {string} state - State name (optional)
  * @param {number} lat - Latitude (from user profile)
@@ -13,94 +13,29 @@ const { fetchFromOpenWeather } = require('./openweatherHelper');
  * @returns {Object} AQI data with pollutants
  */
 async function getCurrentAQI(city, state = '', lat = null, lon = null) {
-    const cacheKey = `aqi:${city}:${state}`;
-
     try {
-        // Check Redis cache first
-        const cached = await redis.get(cacheKey);
-        if (cached) {
-            console.log(`✅ Cache hit for ${city}`);
-            return JSON.parse(cached);
-        }
-
+        // REAL-TIME DATA: No cache - always fetch fresh AQI
         let result = null;
 
-        // Strategy 1: Try OpenWeatherMap (if lat/lon available)
-        if (lat && lon) {
+        // Strategy 1: Try WAQI (accurate for India with real monitoring stations)
+        try {
+            console.log(`🌏 Trying WAQI for ${city}`);
+            result = await fetchFromWAQI(city);
+            result.state = state; // Add state from user
+            console.log(`✅ WAQI: ${city} AQI = ${result.aqi}`);
+        } catch (waqiError) {
+            console.log(`⚠️ WAQI failed for ${city}: ${waqiError.message}`);
+        }
+
+        // Strategy 2: Try OpenWeatherMap (if WAQI failed and lat/lon available)
+        if (!result && lat && lon) {
             try {
                 console.log(`🌍 Trying OpenWeatherMap for ${city} (${lat}, ${lon})`);
                 result = await fetchFromOpenWeather(lat, lon, city);
-                result.state = state; // Add state from user
+                result.state = state;
                 console.log(`✅ OpenWeatherMap: ${city} AQI = ${result.aqi}`);
             } catch (owmError) {
                 console.log(`⚠️ OpenWeatherMap failed for ${city}: ${owmError.message}`);
-            }
-        }
-
-        // Strategy 2: Fallback to CPCB API (India major cities only)
-        if (!result) {
-            try {
-                console.log(`🇮🇳 Trying CPCB for ${city}`);
-                const apiKey = process.env.CPCB_API_KEY;
-                const resourceId = process.env.CPCB_RESOURCE_ID;
-
-                const url = `https://api.data.gov.in/resource/${resourceId}`;
-                const params = {
-                    'api-key': apiKey,
-                    format: 'json',
-                    limit: 10
-                };
-
-                if (city) params['filters[city]'] = city;
-                if (state) params['filters[state]'] = state;
-
-                const response = await axios.get(url, { params });
-
-                if (!response.data || !response.data.records || response.data.records.length === 0) {
-                    throw new Error(`No CPCB data found for ${city}`);
-                }
-
-                const records = response.data.records;
-                const pollutantSums = { pm25: 0, pm10: 0, no2: 0, so2: 0, co: 0, o3: 0 };
-
-                records.forEach(record => {
-                    const pollutantId = record.pollutant_id;
-                    const pollutantAvg = parseFloat(record.pollutant_avg) || 0;
-
-                    if (pollutantId === 'PM2.5') pollutantSums.pm25 += pollutantAvg;
-                    else if (pollutantId === 'PM10') pollutantSums.pm10 += pollutantAvg;
-                    else if (pollutantId === 'NO2') pollutantSums.no2 += pollutantAvg;
-                    else if (pollutantId === 'SO2') pollutantSums.so2 += pollutantAvg;
-                    else if (pollutantId === 'CO') pollutantSums.co += pollutantAvg;
-                    else if (pollutantId === 'Ozone') pollutantSums.o3 += pollutantAvg;
-                });
-
-                const aqi = Math.max(
-                    pollutantSums.pm25, pollutantSums.pm10, pollutantSums.no2,
-                    pollutantSums.so2, pollutantSums.co, pollutantSums.o3
-                );
-
-                result = {
-                    city: records[0].city || city,
-                    state: records[0].state || state,
-                    station: records[0].station || 'Multiple Stations',
-                    aqi: Math.round(aqi),
-                    pollutants: {
-                        pm25: Math.round(pollutantSums.pm25),
-                        pm10: Math.round(pollutantSums.pm10),
-                        no2: Math.round(pollutantSums.no2),
-                        so2: Math.round(pollutantSums.so2),
-                        co: Math.round(pollutantSums.co),
-                        o3: Math.round(pollutantSums.o3)
-                    },
-                    source: 'CPCB',
-                    last_update: records[0].last_update || new Date().toISOString()
-                };
-
-                console.log(`✅ CPCB: ${city} AQI = ${result.aqi}`);
-
-            } catch (cpcbError) {
-                console.error(`❌ CPCB also failed for ${city}:`, cpcbError.message);
             }
         }
 
@@ -126,10 +61,7 @@ async function getCurrentAQI(city, state = '', lat = null, lon = null) {
             throw new Error(`Unable to fetch AQI data for ${city}`);
         }
 
-        // Cache for 10 minutes
-        await redis.setEx(cacheKey, 600, JSON.stringify(result));
-
-        // Store in MongoDB for historical analysis
+        // Store in MongoDB for historical analysis only (not for caching)
         const now = new Date();
         await AQIData.create({
             city: result.city,

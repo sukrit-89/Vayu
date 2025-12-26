@@ -49,6 +49,7 @@ api.interceptors.response.use(
 export const authAPI = {
     register: (data) => api.post('/auth/register', data),
     login: (data) => api.post('/auth/login', data),
+    updateLocation: (data) => api.put('/auth/location', data),
 };
 
 // AQI API
@@ -57,13 +58,19 @@ export const aqiAPI = {
         params: { city, state, lat, lon }
     }),
     getForecast: (city) => api.get('/aqi/forecast', { params: { city } }),
+    getHourly: (city, lat, lon) => api.get('/aqi/hourly', {
+        params: { city, lat, lon }
+    }),
+    geocode: (city, state) => api.get('/aqi/geocode', {
+        params: { city, state }
+    }),
 };
 
 // Chat API
 export const chatAPI = {
-    sendMessage: (message) => api.post('/chat', { message }),
+    sendMessage: (message, currentAQI) => api.post('/chat', { message, currentAQI }),
     sendVoice: (formData) => api.post('/chat/voice', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 'Content-Type': 'multipart/form-data' },
     }),
 };
 

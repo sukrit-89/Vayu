@@ -1,4 +1,4 @@
-# Air Quality App 🌿
+# Vayu 🌿
 
 A comprehensive full-stack mobile application providing real-time air quality monitoring for India with AI-powered health chatbot, community actions, news summaries, and product recommendations.
 
